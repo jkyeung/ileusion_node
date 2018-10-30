@@ -1,0 +1,20 @@
+{
+  "name": "ileusion_node",
+  "version": "1.0.0",
+  "description": "Library for interacting with the ILEusion server.",
+  "main": "index.js",
+  "dependencies": {
+    "request": "^2.88.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ibmi",
+    "as400",
+    "iseries"
+  ],
+  "author": "Liam Allan / sitemule",
+  "license": "MIT"
+}
