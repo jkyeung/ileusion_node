@@ -1,4 +1,4 @@
-var IBMi = require('.');
+var IBMi = require('./index');
 
 var myibmi = new IBMi('http://10.1.31.153:8008');
 
