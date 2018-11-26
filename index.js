@@ -148,6 +148,13 @@ module.exports = class IBMi {
     return body;
   }
 
+  CL(command) {
+    return {
+      action: "/cl",
+      command: command
+    };
+  }
+
   send(actions) {
     return sendRequest(this.url + '/transaction', actions);
   }

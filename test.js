@@ -33,8 +33,9 @@ async function hello() {
   var actions = [];
   actions.push(myibmi.executeSQL("select * from product where manuID = 'SAMSUNG'"));
   actions.push(myibmi.callProgram(['barry', 'fak100'], fak100parms));
-  actions.push(myibmi.sendDataQueue(['barry', 'testdq'], "This is my fucking test!!!!!!!", null));
+  actions.push(myibmi.sendDataQueue(['barry', 'testdq'], "This is my test: " + (new Date().getTime()), null));
   actions.push(myibmi.popDataQueue(['barry', 'testdq'], {}));
+  actions.push(myibmi.CL("addlible systools"));
 
   console.log(await myibmi.send(actions));
 
