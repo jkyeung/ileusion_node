@@ -30,11 +30,11 @@ async function hello() {
     }
   ];
 
-  console.log(await myibmi.executeSQL("select * from product where manuID = 'SAMSUNG'"));
+  var actions = [];
+  actions.push(myibmi.executeSQL("select * from product where manuID = 'SAMSUNG'"));
+  actions.push(myibmi.callProgram(['barry', 'fak100'], fak100parms));
+  actions.push(myibmi.sendDataQueue(['barry', 'testdq'], "This is my fucking test!!!!!!!", null));
+  actions.push(myibmi.popDataQueue(['barry', 'testdq'], {}));
 
-  var fak100 = myibmi.constructCall(['barry', 'fak100'], null, fak100parms);
-  console.log(await fak100(["Barry", 443, 4]));
-
-  console.log(await myibmi.sendDataQueue(['barry', 'testdq'], "This is my fucking test!!!!!!!", null));
-  console.log(await myibmi.popDataQueue(['barry', 'testdq'], {}));
+  console.log(await myibmi.send(actions));
 }
