@@ -1,4 +1,7 @@
+var util = require('util');
+
 var request = require('request');
+var request_p = util.promisify(request);
 
 module.exports = class IBMi {
   /**
@@ -15,17 +18,18 @@ module.exports = class IBMi {
    * Execute an SQL statement against the remote Db2 for i database.
    * 
    * @param {string} statement SQL statement to be executed on the server.
-   * @param {function} callback Callback function(err, res)
+   * @returns Promise<object>
    */
-  executeSQL(statement, callback) {
-    sendRequest(this.url + '/sql', {
+  executeSQL(statement) {
+    return sendRequest(this.url + '/sql', {
+      action: "/sql",
       query: statement
-    }, callback);
+    });
   }
 
   /**
    * Construct a function based on a program or function call for later user.
-   * @returns {function} Returns a function(arrayparms, callback(err, res));
+   * @returns Promise
    * 
    * @param {array} path An array leading to the program or function. [0]=Library, [1]=Object, [2]=Function (optional)
    * @param {object|null} returnType An object defining the return type of the function. Can use `null` if calling a program or is `void`.
@@ -34,6 +38,7 @@ module.exports = class IBMi {
   constructCall(path, returnType, args) {
     var endpoint = this.url;
     var body = {
+      action: "/call",
       library: path[0].toUpperCase(),
       object: path[1].toUpperCase(),
       args: args
@@ -45,7 +50,7 @@ module.exports = class IBMi {
     if (returnType !== undefined)
       body.result = returnType;
 
-    return function (args, callback) {
+    return async function (args) {
       if (args != null) {
         for (var i = 0; i < args.length; i++) {
           if (Array.isArray(args[i])) {
@@ -56,7 +61,7 @@ module.exports = class IBMi {
         }
       }
 
-      sendRequest(endpoint + '/call', body, callback);
+      return sendRequest(endpoint + '/call', body);
     };
   }
 
@@ -65,12 +70,12 @@ module.exports = class IBMi {
    * 
    * @param {array} path An array leading to the program or function. [0]=Library, [1]=Object
    * @param {array} args An array defining the types of values being passed into the program or function.
-   * @param {function} callback Callback function(err, res)
+   * @returns Promise
    */
-  callProgram(path, args, callback) {
+  callProgram(path, args) {
     var theFunc = this.constructCall(path, undefined, args);
 
-    theFunc(null, callback);
+    return theFunc(null);
   }
 
   /**
@@ -79,12 +84,12 @@ module.exports = class IBMi {
    * @param {array} path An array leading to the program or function. [0]=Library, [1]=Object, [2]=Function name
    * @param {object|null} returnType An object defining the return type of the function. Can use `null` if calling a program or is `void`.
    * @param {array} args An array defining the types of values being passed into the program or function.
-   * @param {function} callback Callback function(err, res)
+   * @returns Promise
    */
-  callFunction(path, returnType, args, callback) {
+  callFunction(path, returnType, args) {
     var theFunc = this.constructCall(path, returnType, args);
 
-    theFunc(null, callback);
+    return theFunc(null);
   }
 
   /**
@@ -93,10 +98,11 @@ module.exports = class IBMi {
    * @param {array} path An array leading to the data queue. [0]=Library, [1]=Object
    * @param {any} data Data which will be pushed into the data queue.
    * @param {key} key The key to be used when inserting into the data queue. If not key is required, can pass `null`.
-   * @param {function} callback Callback function(err, res)
+   * @returns Promise
    */
-  sendDataQueue(path, data, key, callback) {
+  sendDataQueue(path, data, key) {
     var body = {
+      action: "/dq/send",
       library: path[0].toUpperCase(),
       object: path[1].toUpperCase(),
       data: data
@@ -105,7 +111,7 @@ module.exports = class IBMi {
     if (key !== null)
       body.key = key;
 
-    sendRequest(this.url + '/dq/send', body, callback);
+    return sendRequest(this.url + '/dq/send', body);
   }
   /**
    * Pop an item from a data queue.
@@ -118,10 +124,11 @@ module.exports = class IBMi {
   keyorder: 'EQ',
   key: 'MYKEY'
 }```
-   * @param {function} callback Callback function(err, res)
+   * @returns Promise
    */
-  popDataQueue(path, props, callback) {
+  popDataQueue(path, props) {
     var body = {
+      action: "/dq/pop",
       library: path[0].toUpperCase(),
       object: path[1].toUpperCase(),
       waitime: 0
@@ -138,29 +145,29 @@ module.exports = class IBMi {
         body.key = key;
     }
 
-    sendRequest(this.url + '/dq/pop', body, callback);
+    return sendRequest(this.url + '/dq/pop', body);
   }
 }
 
-function sendRequest(endpoint, jsonBody, callback) {
-  request({
-    method: 'post',
-    body: jsonBody,
-    json: true,
-    url: endpoint
-  }, function (err, res, body) {
-    if (err) {
-      callback(err, null);
-    } else {
-      if (body.success !== undefined) {
-        if (body.success === false) {
-          callback(body.message, null);
-          err = body.message;
-        }
-      }
+async function sendRequest(endpoint, jsonBody) {
+  try {
+    const result = await request_p({
+      method: 'post',
+      body: jsonBody,
+      json: true,
+      url: endpoint
+    });
 
-      if (err == null)
-        callback(null, body);
+    var body = result.body;
+
+    if (body.success !== undefined) {
+      if (body.success === false) {
+        return Promise.reject(body);
+      }
     }
-  })
+
+    return Promise.resolve(body);
+  } catch (error) {
+    return Promise.reject(error);
+  }
 };
