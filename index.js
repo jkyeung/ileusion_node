@@ -149,7 +149,7 @@ module.exports = class IBMi {
   }
 
   send(actions) {
-    return sendRequest(this.url + '/any', actions);
+    return sendRequest(this.url + '/transaction', actions);
   }
 }
 

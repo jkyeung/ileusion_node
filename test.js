@@ -37,4 +37,6 @@ async function hello() {
   actions.push(myibmi.popDataQueue(['barry', 'testdq'], {}));
 
   console.log(await myibmi.send(actions));
+
+  console.log('end');
 }
