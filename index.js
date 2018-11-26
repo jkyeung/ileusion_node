@@ -155,6 +155,11 @@ module.exports = class IBMi {
     };
   }
 
+  /**
+   * 
+   * @param {array} actions An array of JSON objects
+   * @returns array of results for each transaction.
+   */
   send(actions) {
     return sendRequest(this.url + '/transaction', actions);
   }
