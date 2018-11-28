@@ -4,6 +4,9 @@ var request = require('request');
 var request_p = util.promisify(request);
 
 module.exports = class IBMi {
+  static SQL_SELECT() {return 1};
+  static SQL_EXEC() {return 2};
+
   /**
    * Constructor for the IBMi class.
    *
@@ -18,12 +21,14 @@ module.exports = class IBMi {
    * Execute an SQL statement against the remote Db2 for i database.
    * 
    * @param {string} statement SQL statement to be executed on the server.
+   * @param {number} SQL execution mode. SQL_SELECT/1 or SQL_EXEC/2.
    * @returns IBM i action / JSON Body
    */
-  executeSQL(statement) {
+  executeSQL(statement, mode) {
     return {
       action: "/sql",
-      query: statement
+      query: statement,
+      mode: mode || 1
     };
   }
 

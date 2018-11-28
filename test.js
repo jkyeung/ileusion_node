@@ -35,7 +35,7 @@ async function hello() {
     myibmi.callProgram(['barry', 'fak100'], fak100parms),
     myibmi.sendDataQueue(['barry', 'testdq'], "This is my test: " + (new Date().getTime())),
     myibmi.popDataQueue(['barry', 'testdq']),
-    myibmi.CL("addliliohls")
+    myibmi.executeSQL("delete from product where prodkey = 880", IBMi.SQL_EXEC())
   ];
 
   console.log(await myibmi.send(actions));
