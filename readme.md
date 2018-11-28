@@ -31,12 +31,16 @@ await myibmi.send(transactions);
 
 ---
 
-### `object IBMi#executeSQL(string)`
+### `object IBMi#executeSQL(string, mode)`
 
-Execute an SQL statement to get data from the remote server. Returns a JSON transaction object.
+Execute an SQL statement on the the remote server.
+
+1. The SQL statement.
+2. The mode of execution. `IBMi.SQL_SELECT()` (or `1`) to fetch data (`select`) from the server, or `IBMi.SQL_EXEC()` (`2`) to execute any other statements. The default is `1`.
 
 ```js
 transactions.push(myibmi.executeSQL("select * from mytable where u_id = 1"));
+transactions.push(myibmi.executeSQL("delete from product where prodkey = 880", IBMi.SQL_EXEC()));
 ```
 
 ---
