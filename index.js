@@ -160,6 +160,13 @@ module.exports = class IBMi {
     };
   }
 
+  QSH(command) {
+    return {
+      action: "/qsh",
+      command: command
+    };
+  }
+
   /**
    * 
    * @param {array} actions An array of JSON objects

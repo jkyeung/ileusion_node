@@ -125,3 +125,17 @@ Returns a JSON transaction object.
 transactions.push(myibmi.CL("addliliohls"));
 transactions.push(myibmi.CL("addlible systools"));
 ```
+
+---
+
+### `object IBMi#QSH(string)`
+
+Execute a CL command on the remote server.
+
+Returns a JSON transaction object.
+
+Result returns an object with `success` and `returned` (which is the exit code of the QSH command).
+
+```js
+transactions.push(myibmi.QSH("mkdir xxx"));
+```
