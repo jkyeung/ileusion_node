@@ -130,7 +130,7 @@ transactions.push(myibmi.CL("addlible systools"));
 
 ### `object IBMi#QSH(string)`
 
-Execute a CL command on the remote server.
+Execute a Qshell command on the remote server.
 
 Returns a JSON transaction object.
 
